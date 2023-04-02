@@ -8,7 +8,7 @@ const PostsTable = () => {
         try {
             await axios
                 .get("/api/posts")
-                .then((response) => setPosts(response.data));
+                .then((response) => setPosts(response.data.data));
         } catch (error) {
             console.log(error);
         }
