@@ -14,9 +14,13 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $posts = Post::with('category')->paginate(10);
+        $posts = Post::with('category')
+        ->when($request->filled('category_id'), function($query) use($request) {
+            $query->where('category_id', $request->category_id);
+        })
+        ->paginate(10);
         return PostResource::collection($posts);
     }
 

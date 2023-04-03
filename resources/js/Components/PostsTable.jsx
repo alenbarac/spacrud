@@ -3,22 +3,37 @@ import { useEffect, useState } from "react";
 
 const PostsTable = () => {
     const [posts, setPosts] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [query, setQuery] = useState({ page: 1, category_id: "" });
 
-    const fetchPosts = async (page = 1) => {
+    const fetchPosts = async () => {
+        const { page, category_id } = query;
         try {
             await axios
-                .get("/api/posts", { params: { page } })
+                .get("/api/posts", { params: { category_id, page } })
                 .then((response) => setPosts(response.data));
         } catch (error) {
             console.log(error);
         }
     };
 
-    const changePage = (url) => {
-        const fullUrl = new URL(url);
-        const page = fullUrl.searchParams.get("page");
+    const fetchCats = async () => {
+        try {
+            await axios
+                .get("/api/categories")
+                .then((response) => setCategories(response.data.data));
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
-        fetchPosts(page);
+    const pageChange = (url) => {
+        const fullUrl = new URL(url);
+        setQuery({ ...query, page: fullUrl.searchParams.get("page") });
+    };
+
+    const categoryChange = (event) => {
+        setQuery({ page: 1, category_id: event.target.value });
     };
 
     const renderPaginatorLinks = () => {
@@ -30,7 +45,7 @@ const PostsTable = () => {
                     return (
                         <button
                             onClick={() => {
-                                changePage(link.url);
+                                pageChange(link.url);
                             }}
                             key={index}
                             dangerouslySetInnerHTML={{ __html: link.label }}
@@ -86,13 +101,37 @@ const PostsTable = () => {
         );
     };
 
+    console.log(query);
+
+    const renderCategoryFilter = () => {
+        return (
+            <select
+                onChange={categoryChange}
+                className="mt-1 w-full sm:mt-0 sm:w-1/4 rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            >
+                <option value="">-- all categories --</option>
+                {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                        {category.name}
+                    </option>
+                ))}
+            </select>
+        );
+    };
+
     useEffect(() => {
         fetchPosts();
+        fetchCats();
     }, []);
+
+    useEffect(() => {
+        fetchPosts();
+    }, [query.category_id, query.page]);
 
     return (
         <div className="overflow-hidden overflow-x-auto p-6 bg-white border-gray-200">
             <div className="min-w-full align-middle">
+                <div className="mb-4 text-black">{renderCategoryFilter()}</div>
                 <table className="table">
                     <thead className="table-header">
                         <tr>
