@@ -4,13 +4,25 @@ import { useEffect, useState } from "react";
 const PostsTable = () => {
     const [posts, setPosts] = useState([]);
     const [categories, setCategories] = useState([]);
-    const [query, setQuery] = useState({ page: 1, category_id: "" });
+    const [query, setQuery] = useState({
+        page: 1,
+        category_id: "",
+        order_column: "id",
+        order_direction: "desc",
+    });
 
     const fetchPosts = async () => {
-        const { page, category_id } = query;
+        const { page, category_id, order_column, order_direction } = query;
         try {
             await axios
-                .get("/api/posts", { params: { category_id, page } })
+                .get("/api/posts", {
+                    params: {
+                        category_id,
+                        page,
+                        order_column,
+                        order_direction,
+                    },
+                })
                 .then((response) => setPosts(response.data));
         } catch (error) {
             console.log(error);
@@ -101,8 +113,6 @@ const PostsTable = () => {
         );
     };
 
-    console.log(query);
-
     const renderCategoryFilter = () => {
         return (
             <select
@@ -119,6 +129,32 @@ const PostsTable = () => {
         );
     };
 
+    const orderChanged = (column) => {
+        let direction = "asc";
+        if (column === query.order_column) {
+            direction = query.order_direction === "asc" ? "desc" : "asc";
+        }
+        setQuery({
+            ...query,
+            page: 1,
+            order_column: column,
+            order_direction: direction,
+        });
+    };
+
+    const orderColumnIcon = (column) => {
+        let icon = "fa-sort";
+        if (query.order_column === column) {
+            if (query.order_direction === "asc") {
+                icon = "fa-sort-up";
+            } else {
+                icon = "fa-sort-down";
+            }
+        }
+
+        return <i className={`fa-solid ${icon}`}></i>;
+    };
+
     useEffect(() => {
         fetchPosts();
         fetchCats();
@@ -126,7 +162,11 @@ const PostsTable = () => {
 
     useEffect(() => {
         fetchPosts();
-    }, [query.category_id, query.page]);
+    }, [query.category_id, query.page, query.column]);
+    console.log(query);
+
+    {
+    }
 
     return (
         <div className="overflow-hidden overflow-x-auto p-6 bg-white border-gray-200">
@@ -136,19 +176,43 @@ const PostsTable = () => {
                     <thead className="table-header">
                         <tr>
                             <th>
-                                <span>ID</span>
+                                <div>
+                                    <span>ID</span>
+                                    <button
+                                        onClick={() => orderChanged("id")}
+                                        type="button"
+                                        className="column-sort"
+                                    >
+                                        {orderColumnIcon("id")}
+                                    </button>
+                                </div>
                             </th>
                             <th>
-                                <span>Title</span>
+                                <div>
+                                    <span>Title</span>
+                                    <button
+                                        onClick={() => orderChanged("title")}
+                                        type="button"
+                                        className="column-sort"
+                                    >
+                                        {orderColumnIcon("title")}
+                                    </button>
+                                </div>
                             </th>
                             <th>
-                                <span>Category</span>
+                                <div>
+                                    <span>Category</span>
+                                </div>
                             </th>
                             <th>
-                                <span>Content</span>
+                                <div>
+                                    <span>Content</span>
+                                </div>
                             </th>
                             <th>
-                                <span>Created at</span>
+                                <div>
+                                    <span>Created at</span>
+                                </div>
                             </th>
                         </tr>
                     </thead>
