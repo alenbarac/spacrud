@@ -162,7 +162,12 @@ const PostsTable = () => {
 
     useEffect(() => {
         fetchPosts();
-    }, [query.category_id, query.page, query.column]);
+    }, [
+        query.category_id,
+        query.page,
+        query.order_column,
+        query.order_direction,
+    ]);
     console.log(query);
 
     {
