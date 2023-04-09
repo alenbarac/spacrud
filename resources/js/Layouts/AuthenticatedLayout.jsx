@@ -28,6 +28,13 @@ export default function Authenticated({ auth, header, children }) {
                                 >
                                     Dashboard
                                 </NavLink>
+
+                                <NavLink
+                                    href={route("post.create")}
+                                    active={route().current("post.create")}
+                                >
+                                    Create Post
+                                </NavLink>
                             </div>
                         </div>
 
