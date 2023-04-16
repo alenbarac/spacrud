@@ -168,10 +168,6 @@ const PostsTable = () => {
         query.order_column,
         query.order_direction,
     ]);
-    console.log(query);
-
-    {
-    }
 
     return (
         <div className="overflow-hidden overflow-x-auto p-6 bg-white border-gray-200">
